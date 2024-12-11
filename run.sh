@@ -5,17 +5,18 @@ set -e
 VENV_DIR=".venv"
 PORT=8091
 PID_FILE="pid.txt"
+LOG_DIRECTORY="logs"
 
 # Function to check if the process is actually running
 is_process_running() {
     local pid=$1
     if [ -n "$pid" ] && ps -p "$pid" > /dev/null 2>&1; then
         # Also verify it's our Flask app
-        if ps -p "$pid" -o command= | grep -q "ython app.py"; then  # Changed to app.py
-            return 0  # Process is running
+        if ps -p "$pid" -o command= | grep -q "python main.py"; then  # Changed to app.py
+            return 1  # Process is running
         fi
     fi
-    return 1  # Process is not running
+    return 0  # Process is not running
 }
 
 # Function to check if Flask is responding
@@ -59,6 +60,10 @@ fi
 
 if [ $need_to_start -eq 1 ]; then
     # Start the Flask application in the background
+    if [ ! -d "$LOG_DIRECTORY" ]; then
+        echo "$LOG_DIRECTORY does not exist. Creating one."
+        mkdir -p "$LOG_DIRECTORY"
+    fi
     nohup python3 app.py > logs/flask.log 2>&1 & 
     APP_PID=$!
     echo "$APP_PID" > "$PID_FILE"
