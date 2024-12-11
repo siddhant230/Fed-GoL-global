@@ -90,3 +90,4 @@ logs/
 
 nohup.out
 pid.txt
+last_processed.json
