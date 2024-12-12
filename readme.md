@@ -43,6 +43,8 @@ Welcome to the Federated version of famous Conways game of life. This is a feder
 
 ## How It Works
 
+<img src="UI_visuals/flow.png">
+
 1. Only visuals which supports changing color.
 2. Dependent of [Local Game-of-Life setup](https://github.com/siddhant230/Fed-GoL)
 
