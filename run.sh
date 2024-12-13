@@ -3,9 +3,11 @@ set -e
 
 # Configuration
 VENV_DIR=".venv"
-PORT=8091
+PORT=5000
 PID_FILE="pid.txt"
 LOG_DIRECTORY="logs"
+MAIN_PID_FILE="main_pid.txt"
+
 
 # Function to check if the process is actually running
 is_process_running() {
@@ -84,8 +86,27 @@ else
     echo "No action needed - application is already running"
 fi
 
-# Run the main processing script
-python3 main.py
+
+# Check if main.py is already running
+main_need_to_start=1
+if [ -f "$MAIN_PID_FILE" ]; then
+    EXISTING_MAIN_PID=$(cat "$MAIN_PID_FILE")
+    if ps -p "$EXISTING_MAIN_PID" > /dev/null 2>&1; then
+        echo "Main script is already running (PID: $EXISTING_MAIN_PID)"
+        main_need_to_start=0
+    else
+        echo "Found stale main PID file, will start new instance"
+        rm "$MAIN_PID_FILE"
+    fi
+fi
+
+# Only start main.py if it's not already running
+if [ $main_need_to_start -eq 1 ]; then
+    nohup python3 main.py > logs/main.log 2>&1 &
+    MAIN_PID=$!
+    echo "$MAIN_PID" > "$MAIN_PID_FILE"
+    echo "Started main script (PID: $MAIN_PID)"
+fi
 
 # Deactivate virtual environment
 deactivate

@@ -7,6 +7,8 @@ from syftbox.lib import Client
 import requests
 from typing import List
 import shutil
+import time
+import logging
 
 API_NAME = "fed_gol"
 
@@ -19,7 +21,7 @@ def network_participants(datasite_path: Path) -> List[str]:
 def send_event_to_flask(event_data: dict) -> bool:
     try:
         response = requests.post(
-            'http://localhost:8091/internal/event', json=event_data)
+            'http://localhost:5000/internal/event', json=event_data)
         return response.status_code == 200
     except requests.RequestException:
         return False
@@ -116,13 +118,11 @@ def main():
     image_input_path = client.datasite_path / "api_data" / API_NAME / "images"
     os.makedirs(image_input_path, exist_ok=True)
 
-    # Fetch all new added images
-    peers = network_participants(client.datasite_path.parent)
-    new_events = get_latest_events(client.datasite_path.parent, peers)
-
-    print(f"Processed {len(new_events)} new events")
-    return new_events
-
+    while True:
+        peers = network_participants(client.datasite_path.parent)
+        new_events = get_latest_events(client.datasite_path.parent, peers)
+        logging.info(f"Processed {len(new_events)} new events")
+        time.sleep(0.5)
 
 if __name__ == "__main__":
     main()

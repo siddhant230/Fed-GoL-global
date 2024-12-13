@@ -90,5 +90,6 @@ logs/
 
 nohup.out
 pid.txt
+main_pid.txt
 
 static/images

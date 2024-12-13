@@ -36,4 +36,4 @@ def events():
     print("Client connected to event stream") 
     return Response(generate(), mimetype='text/event-stream')
 
-app.run(debug=False, port=8091)
+app.run(host="0.0.0.0", debug=False, port=5000)
